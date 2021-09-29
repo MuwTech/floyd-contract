@@ -22,9 +22,6 @@ const treasuryWallets = [
 ];
 
 module.exports = [
-    "",
-    "",
-    1630306800,
     treasuryWallets,
     treasuryShares
 ]
