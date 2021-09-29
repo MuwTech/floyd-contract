@@ -1,9 +1,9 @@
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: ISC
 
-pragma solidity ^0.8.0;
+pragma solidity >=0.6.0 <0.8.0;
 
-import {SafeMath} from "@openzeppelin/contracts/math/SafeMath.sol";
-import {EIP712Base} from "./EIP712Base.sol";
+import "@openzeppelin/contracts/math/SafeMath.sol";
+import {EIP712Base} from "./EIP712base.sol";
 
 contract NativeMetaTransaction is EIP712Base {
     using SafeMath for uint256;

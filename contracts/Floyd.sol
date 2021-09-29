@@ -1,16 +1,18 @@
-pragma solidity ^0.8.0;
+// SPDX-License-Identifier: ISC
 
-import "@openzeppelin-solidity/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
-import "@openzeppelin/contracts/access/Ownable.sol";
+pragma solidity >=0.6.0 <0.8.0;
+
+import "@openzeppelin/contracts/token/ERC721/IERC721Enumerable.sol";
+import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/payment/PaymentSplitter.sol";
 import "@openzeppelin/contracts/math/SafeMath.sol";
-import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
+import {ERC721} from "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 
 
 import "./ContentMixin.sol";
 import "./Nt.sol";
-import "./ClaimableWithSvin.sol";
+// import "./ClaimableWithSvin.sol";
 
 contract OwnableDelegateProxy {}
 
@@ -103,7 +105,7 @@ abstract contract Pausable is Context {
     }
 }
 
-abstract contract FloydMinting is ERC721Enumerable {
+abstract contract FloydMinting is ERC721 {
     function _mintFloyd(address owner, uint256 startingIndex, uint16 number) internal {
         for (uint i = 0; i < number; i++) {
             _safeMint(owner, startingIndex + i);
@@ -111,7 +113,7 @@ abstract contract FloydMinting is ERC721Enumerable {
     }
 }
 
-abstract contract FloydSelling is FloydMinting, Pausable, ContextMixin, NativeMetaTransaction {
+abstract contract FloydSelling is FloydMinting, Pausable, ContextMixin, NativeMetaTransaction, Ownable, PaymentSplitter, ReentrancyGuard {
     uint256 constant maxFloyd = 9840;
     uint constant sellableFloydStartingIndex = 600;
     uint constant giveawayFloydStartingIndex = 20;
@@ -123,6 +125,9 @@ abstract contract FloydSelling is FloydMinting, Pausable, ContextMixin, NativeMe
     uint256 public nextFloydForSale;
     uint public nextFloydToGiveaway;
     uint public nextSpecialFloyd;
+
+    // Storage for treasury wallets.
+    address[] private _treasuryWallets;
 
     constructor() {
         nextFloydForSale = sellableFloydStartingIndex;
@@ -187,14 +192,22 @@ abstract contract FloydSelling is FloydMinting, Pausable, ContextMixin, NativeMe
     }
 }
 
-contract Floyd is Floydselling {
+abstract contract Floyd is FloydSelling {
     string _provenanceHash;
     string baseURI_;
     address proxyRegistryAddress;
 
+    // Storage for treasury wallets.
+    address[] private _treasuryWallets;
+
     //needs to be set to our API
-    constructor(address _proxyRegistryAddress) ERC721("Floyd", "FLOYD") {
-        proxyRegistryAddress = _proxyRegistryAddress;
+    constructor(
+        // address _proxyRegistryAddress, 
+        address[] memory treasuryWallets, uint256[] memory treasuryShares) 
+    ERC721("Floyd", "FLOYD") 
+    PaymentSplitter(treasuryWallets, treasuryShares) {
+        _treasuryWallets = treasuryWallets;
+        // proxyRegistryAddress = _proxyRegistryAddress;
         _pause();
         setBaseURI("https://api.Floyd.io/api/");
     }
@@ -224,7 +237,7 @@ contract Floyd is Floydselling {
         baseURI_ = baseURI;
     }
 
-    function _baseURI() internal view override returns (string memory) {
+    function _baseURI() internal view returns (string memory) {
         return baseURI_;
     }
 
@@ -254,20 +267,20 @@ contract Floyd is Floydselling {
     /**
      * Override isApprovedForAll to whitelist user's OpenSea proxy accounts to enable gas-less listings.
      */
-    function isApprovedForAll(address owner, address operator)
-        override
-        public
-        view
-        returns (bool)
-    {
-        // Whitelist OpenSea proxy contract for easy trading.
-        ProxyRegistry proxyRegistry = ProxyRegistry(proxyRegistryAddress);
-        if (address(proxyRegistry.proxies(owner)) == operator) {
-            return true;
-        }
+    // function isApprovedForAll(address owner, address operator)
+    //     override
+    //     public
+    //     view
+    //     returns (bool)
+    // {
+    //     // Whitelist OpenSea proxy contract for easy trading.
+    //     ProxyRegistry proxyRegistry = ProxyRegistry(proxyRegistryAddress);
+    //     if (address(proxyRegistry.proxies(owner)) == operator) {
+    //         return true;
+    //     }
 
-        return super.isApprovedForAll(owner, operator);
-    }
+    //     return super.isApprovedForAll(owner, operator);
+    // }
 
     /**
      * This is used instead of msg.sender as transactions won't be sent by the original token owner, but by OpenSea.
@@ -276,7 +289,7 @@ contract Floyd is Floydselling {
         internal
         override
         view
-        returns (address sender)
+        returns (address payable sender)
     {
         return ContextMixin.msgSender();
     }

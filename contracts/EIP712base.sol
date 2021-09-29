@@ -1,6 +1,6 @@
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: ISC
 
-pragma solidity ^0.8.0;
+pragma solidity >=0.6.0 <0.8.0;
 
 import {Initializable} from "./Initializable.sol";
 
