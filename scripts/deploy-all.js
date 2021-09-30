@@ -21,7 +21,7 @@ async function main() {
         args[2]
     );
     await floyd.deployed();
-    const floyd = floyd.address;
+    const floydAddress = floyd.address;
 
     const file = `${process.cwd()}/data/addresses.json`;
     console.log(`Writing addresses to ${file}`);

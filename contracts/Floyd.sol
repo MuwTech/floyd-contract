@@ -193,7 +193,7 @@ abstract contract FloydSelling is FloydMinting, Pausable, ContextMixin, NativeMe
     }
 }
 
-abstract contract Floyd is FloydSelling {
+contract Floyd is FloydSelling {
     string _provenanceHash;
     string baseURI_;
     address proxyRegistryAddress;
