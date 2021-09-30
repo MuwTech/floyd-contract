@@ -1,13 +1,14 @@
 // SPDX-License-Identifier: ISC
 
-pragma solidity ^0.8.0;
+pragma solidity >=0.6.0 <0.8.0;
 
-// import "@openzeppelin/contracts/token/ERC721/IERC721Enumerable.sol";
+import "@openzeppelin/contracts/token/ERC721/IERC721Enumerable.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/payment/PaymentSplitter.sol";
-// import "@openzeppelin/contracts/math/SafeMath.sol";
+import "@openzeppelin/contracts/math/SafeMath.sol";
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
+import "@openzeppelin/contracts/utils/Context.sol";
 
 
 import "./ContentMixin.sol";
@@ -203,7 +204,8 @@ abstract contract Floyd is FloydSelling {
     //needs to be set to our API
     constructor(
         address _proxyRegistryAddress, 
-        address[] memory treasuryWallets, uint256[] memory treasuryShares) 
+        address[] memory treasuryWallets, 
+        uint256[] memory treasuryShares) 
     ERC721("Floyd", "FLOYD") 
     PaymentSplitter(treasuryWallets, treasuryShares) {
         _treasuryWallets = treasuryWallets;
