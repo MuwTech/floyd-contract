@@ -3,11 +3,12 @@
 pragma solidity >=0.6.0 <0.8.0;
 
 import "@openzeppelin/contracts/token/ERC721/IERC721Enumerable.sol";
-import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/payment/PaymentSplitter.sol";
 import "@openzeppelin/contracts/math/SafeMath.sol";
-import {ERC721} from "@openzeppelin/contracts/token/ERC721/ERC721.sol";
+import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
+import "@openzeppelin/contracts/utils/Context.sol";
 
 
 import "./ContentMixin.sol";
@@ -202,8 +203,9 @@ abstract contract Floyd is FloydSelling {
 
     //needs to be set to our API
     constructor(
-        // address _proxyRegistryAddress, 
-        address[] memory treasuryWallets, uint256[] memory treasuryShares) 
+        address _proxyRegistryAddress, 
+        address[] memory treasuryWallets, 
+        uint256[] memory treasuryShares) 
     ERC721("Floyd", "FLOYD") 
     PaymentSplitter(treasuryWallets, treasuryShares) {
         _treasuryWallets = treasuryWallets;
@@ -267,20 +269,20 @@ abstract contract Floyd is FloydSelling {
     /**
      * Override isApprovedForAll to whitelist user's OpenSea proxy accounts to enable gas-less listings.
      */
-    // function isApprovedForAll(address owner, address operator)
-    //     override
-    //     public
-    //     view
-    //     returns (bool)
-    // {
-    //     // Whitelist OpenSea proxy contract for easy trading.
-    //     ProxyRegistry proxyRegistry = ProxyRegistry(proxyRegistryAddress);
-    //     if (address(proxyRegistry.proxies(owner)) == operator) {
-    //         return true;
-    //     }
+    function isApprovedForAll(address owner, address operator)
+        override
+        public
+        view
+        returns (bool)
+    {
+        // Whitelist OpenSea proxy contract for easy trading.
+        ProxyRegistry proxyRegistry = ProxyRegistry(proxyRegistryAddress);
+        if (address(proxyRegistry.proxies(owner)) == operator) {
+            return true;
+        }
 
-    //     return super.isApprovedForAll(owner, operator);
-    // }
+        return super.isApprovedForAll(owner, operator);
+    }
 
     /**
      * This is used instead of msg.sender as transactions won't be sent by the original token owner, but by OpenSea.
