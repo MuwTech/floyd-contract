@@ -1,5 +1,26 @@
 [
   {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_proxyRegistryAddress",
+        "type": "address"
+      },
+      {
+        "internalType": "address[]",
+        "name": "treasuryWallets",
+        "type": "address[]"
+      },
+      {
+        "internalType": "uint256[]",
+        "name": "treasuryShares",
+        "type": "uint256[]"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "constructor"
+  },
+  {
     "anonymous": false,
     "inputs": [
       {

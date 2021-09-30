@@ -30,10 +30,10 @@ module.exports = {
       url: `https://rinkeby.infura.io/v3/${process.env.INFURA_PROJECT_ID}`,
       accounts: [`0x${process.env.PRIVATE_KEY}`]
     },
-    mainnet: {
-      url: `https://mainnet.infura.io/v3/${process.env.INFURA_PROJECT_ID}`,
-      accounts: [`0x${process.env.PRIVATE_KEY}`]
-    },
+    // mainnet: {
+    //   url: `https://mainnet.infura.io/v3/${process.env.INFURA_PROJECT_ID}`,
+    //   accounts: [`0x${process.env.PRIVATE_KEY}`]
+    // },
     localhost: {
       url: "http://0.0.0.0:6690"
     }
